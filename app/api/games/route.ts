@@ -15,7 +15,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseServer();
   const body = await req.json();
-  const { games } = body as { games: Array<{ date: string; time?: string; opponent: string; game_number?: number; notes?: string }> };
+  const { games } = body as { games: Array<{ date: string; time?: string; opponent: string; game_number?: number; notes?: string; price_per_ticket?: number }> };
 
   if (!games || !Array.isArray(games) || games.length === 0) {
     return NextResponse.json({ error: 'games array required' }, { status: 400 });

@@ -13,6 +13,7 @@ export interface Game {
   opponent: string;
   game_number?: number;
   notes?: string;
+  price_per_ticket?: number; // cost per ticket; multiply by 2 for full-game cost
   created_at: string;
 }
 

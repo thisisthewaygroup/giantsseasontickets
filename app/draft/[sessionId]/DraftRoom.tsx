@@ -129,6 +129,19 @@ export default function DraftRoom({
   );
 
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]));
+  const gameMap = Object.fromEntries(games.map((g) => [g.id, g]));
+
+  // Running cost — only computed for the logged-in user; each dollar is 2 tickets
+  const myTotalCost = myMemberId
+    ? picks
+        .filter((p) => p.member_id === myMemberId)
+        .reduce((sum, p) => {
+          const price = gameMap[p.game_id]?.price_per_ticket;
+          return sum + (price !== undefined ? price * 2 : 0);
+        }, 0)
+    : 0;
+  const myPickCount = myMemberId ? picks.filter((p) => p.member_id === myMemberId).length : 0;
+  const hasPrices = games.some((g) => g.price_per_ticket !== undefined);
 
   return (
     <div className="min-h-screen bg-giants-black text-white">
@@ -238,8 +251,8 @@ export default function DraftRoom({
           />
         </div>
 
-        {/* Sidebar: Draft order */}
-        <div className="w-72 flex-shrink-0">
+        {/* Sidebar: Draft order + my cost */}
+        <div className="w-72 flex-shrink-0 space-y-4">
           <DraftOrderPanel
             session={session}
             members={members}
@@ -247,6 +260,34 @@ export default function DraftRoom({
             totalPicks={picks.length}
             totalGames={games.length}
           />
+
+          {/* My running cost — only shown to the logged-in user */}
+          {myMemberId && hasPrices && (
+            <div className="bg-gray-900 rounded-xl p-4 space-y-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">My Cost So Far</p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-giants-cream">
+                    ${myTotalCost.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {myPickCount} game{myPickCount !== 1 ? 's' : ''} × 2 tickets
+                  </p>
+                </div>
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                  style={{ backgroundColor: memberMap[myMemberId]?.color }}
+                >
+                  {memberMap[myMemberId]?.name[0].toUpperCase()}
+                </div>
+              </div>
+              {myPickCount > 0 && (
+                <p className="text-xs text-gray-600">
+                  avg ${(myTotalCost / myPickCount / 2).toFixed(2)}/ticket per game
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

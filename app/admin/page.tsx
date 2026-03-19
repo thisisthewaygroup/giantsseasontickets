@@ -14,7 +14,7 @@ export default function AdminPage() {
   const [sessions, setSessions] = useState<DraftSession[]>([]);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberEmail, setNewMemberEmail] = useState('');
-  const [pendingGames, setPendingGames] = useState<{ date: string; time?: string; opponent: string; game_number?: number; notes?: string }[]>([]);
+  const [pendingGames, setPendingGames] = useState<{ date: string; time?: string; opponent: string; game_number?: number; notes?: string; price_per_ticket?: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 

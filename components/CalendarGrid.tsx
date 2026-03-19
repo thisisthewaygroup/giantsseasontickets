@@ -123,13 +123,20 @@ export default function CalendarGrid({
                   >
                     <div className="font-semibold truncate text-white">{abbreviateOpponent(game.opponent)}</div>
                     {game.time && <div className="text-gray-400">{game.time}</div>}
+                    {game.price_per_ticket !== undefined && (
+                      <div className="text-gray-400 text-[9px]">${game.price_per_ticket}/tk</div>
+                    )}
                     {pickedBy && (
                       <div className="mt-0.5">
                         <MemberBadge name={pickedBy.name} color={pickedBy.color} size="sm" />
                       </div>
                     )}
                     {isAvailable && isMyTurn && (
-                      <div className="text-giants-orange font-bold mt-0.5">Pick!</div>
+                      <div className="text-giants-orange font-bold mt-0.5">
+                        Pick!{game.price_per_ticket !== undefined && (
+                          <span className="font-normal text-orange-300 ml-1">${(game.price_per_ticket * 2).toFixed(0)}</span>
+                        )}
+                      </div>
                     )}
                   </button>
                 );
