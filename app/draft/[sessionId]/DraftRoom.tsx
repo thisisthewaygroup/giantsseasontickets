@@ -131,6 +131,23 @@ export default function DraftRoom({
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]));
   const gameMap = Object.fromEntries(games.map((g) => [g.id, g]));
 
+  // My picks sorted by game date (chronological)
+  const myPicksSorted = myMemberId
+    ? picks
+        .filter((p) => p.member_id === myMemberId)
+        .slice()
+        .sort((a, b) => {
+          const da = gameMap[a.game_id]?.date ?? '';
+          const db = gameMap[b.game_id]?.date ?? '';
+          return da.localeCompare(db);
+        })
+    : [];
+
+  // All picks sorted newest-first (by pick_number_overall desc)
+  const allPicksSorted = picks
+    .slice()
+    .sort((a, b) => b.pick_number_overall - a.pick_number_overall);
+
   // Running cost — only computed for the logged-in user; each dollar is 2 tickets
   const myTotalCost = myMemberId
     ? picks
@@ -249,6 +266,42 @@ export default function DraftRoom({
             currentDrafterId={currentDrafterId ?? undefined}
             myMemberId={myMemberId ?? undefined}
           />
+
+          {/* Pick History — all picks in reverse pick order, visible to everyone */}
+          <div className="bg-gray-900 rounded-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white">Pick History</h3>
+              <span className="text-xs text-gray-500">{allPicksSorted.length} of {games.length} games picked</span>
+            </div>
+            {allPicksSorted.length === 0 ? (
+              <div className="px-4 py-6 text-center text-sm text-gray-600">
+                No picks yet — draft hasn&apos;t started
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-800 max-h-80 overflow-y-auto">
+                {allPicksSorted.map((p) => {
+                  const game = gameMap[p.game_id];
+                  const member = memberMap[p.member_id];
+                  if (!game || !member) return null;
+                  const d = new Date(game.date + 'T12:00:00');
+                  const dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  return (
+                    <div key={p.id} className="flex items-center gap-3 px-4 py-2.5">
+                      <span className="text-xs text-gray-600 w-6 text-right flex-shrink-0">#{p.pick_number_overall}</span>
+                      <span className="text-[10px] text-gray-600 flex-shrink-0">R{p.round}</span>
+                      <div
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: member.color }}
+                      />
+                      <span className="text-xs font-medium text-white flex-shrink-0" style={{ color: member.color }}>{member.name}</span>
+                      <span className="text-xs text-gray-300 truncate flex-1">{game.opponent}</span>
+                      <span className="text-xs text-gray-500 flex-shrink-0">{dateLabel}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sidebar: Draft order + my cost */}
@@ -285,6 +338,36 @@ export default function DraftRoom({
                 <p className="text-xs text-gray-600">
                   avg ${(myTotalCost / myPickCount / 2).toFixed(2)}/ticket per game
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* My Picks — chronological by game date */}
+          {myMemberId && (
+            <div className="bg-gray-900 rounded-xl p-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                My Picks ({myPicksSorted.length})
+              </p>
+              {myPicksSorted.length === 0 ? (
+                <p className="text-xs text-gray-600">No picks yet</p>
+              ) : (
+                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                  {myPicksSorted.map((p) => {
+                    const game = gameMap[p.game_id];
+                    if (!game) return null;
+                    const d = new Date(game.date + 'T12:00:00');
+                    const dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    return (
+                      <div key={p.id} className="flex items-start gap-2 text-xs">
+                        <span className="text-gray-400 w-12 flex-shrink-0 font-medium">{dateLabel}</span>
+                        <div className="min-w-0">
+                          <div className="text-white font-medium truncate">{game.opponent}</div>
+                          {game.time && <div className="text-gray-500">{game.time}</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}

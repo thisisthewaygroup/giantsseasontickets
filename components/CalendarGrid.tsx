@@ -81,7 +81,7 @@ export default function CalendarGrid({
       <div className="grid grid-cols-7 border-l border-t border-gray-800">
         {/* Leading empty cells */}
         {Array.from({ length: startPad }).map((_, i) => (
-          <div key={`pad-${i}`} className="border-r border-b border-gray-800 bg-gray-950/30 min-h-[80px]" />
+          <div key={`pad-${i}`} className="border-r border-b border-gray-800 bg-gray-950/30 min-h-[100px]" />
         ))}
 
         {days.map((day) => {
@@ -92,11 +92,11 @@ export default function CalendarGrid({
           return (
             <div
               key={dateStr}
-              className={`border-r border-b border-gray-800 min-h-[80px] p-1.5
+              className={`border-r border-b border-gray-800 min-h-[100px] p-1.5
                 ${!isCurrentMonth ? 'bg-gray-950/40' : 'bg-gray-900'}
                 ${dayGames.length > 0 ? 'bg-gray-800/40' : ''}`}
             >
-              <div className="text-xs text-gray-500 font-medium mb-1 text-right pr-0.5">
+              <div className={`text-xs font-semibold mb-1 text-right pr-0.5 ${dayGames.length > 0 ? 'text-gray-300' : 'text-gray-600'}`}>
                 {format(day, 'd')}
               </div>
 
@@ -111,20 +111,20 @@ export default function CalendarGrid({
                     key={game.id}
                     onClick={() => isClickable && onPickGame(game.id)}
                     disabled={!isClickable}
-                    className={`w-full text-left rounded px-1.5 py-1 mb-0.5 text-[10px] leading-tight transition-all
+                    className={`w-full text-left rounded px-1.5 py-1 mb-1 text-xs leading-tight transition-all
                       ${pickedBy
-                        ? 'opacity-80'
+                        ? ''
                         : isClickable
-                          ? 'bg-giants-orange/20 border border-giants-orange/60 hover:bg-giants-orange/40 hover:scale-105 cursor-pointer animate-pulse-subtle'
-                          : 'bg-gray-700/50 cursor-default'
+                          ? 'bg-giants-orange/30 border border-giants-orange/70 hover:bg-giants-orange/50 hover:scale-105 cursor-pointer animate-pulse-subtle'
+                          : 'bg-gray-700/80 border border-gray-600/50 cursor-default'
                       }`}
-                    style={pickedBy ? { backgroundColor: pickedBy.color + '33', borderLeft: `3px solid ${pickedBy.color}` } : {}}
+                    style={pickedBy ? { backgroundColor: pickedBy.color + '55', borderLeft: `3px solid ${pickedBy.color}`, borderTop: `1px solid ${pickedBy.color}44`, borderRight: `1px solid ${pickedBy.color}44`, borderBottom: `1px solid ${pickedBy.color}44` } : {}}
                     title={`${game.opponent}${game.time ? ` at ${game.time}` : ''}${pickedBy ? ` — picked by ${pickedBy.name}` : isClickable ? ' — click to pick!' : ''}`}
                   >
-                    <div className="font-semibold truncate text-white">{abbreviateOpponent(game.opponent)}</div>
-                    {game.time && <div className="text-gray-400">{game.time}</div>}
+                    <div className="font-bold truncate text-white">{abbreviateOpponent(game.opponent)}</div>
+                    {game.time && <div className="text-gray-300 text-[11px]">{game.time}</div>}
                     {game.price_per_ticket !== undefined && (
-                      <div className="text-gray-400 text-[9px]">${game.price_per_ticket}/tk</div>
+                      <div className="text-gray-300 text-[10px]">${game.price_per_ticket}/tk</div>
                     )}
                     {pickedBy && (
                       <div className="mt-0.5">
